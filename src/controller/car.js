@@ -1,3 +1,5 @@
+import CarModel from "../model/car.js";
+
 let cars = [
   {
     id: 1,
@@ -19,17 +21,17 @@ let cars = [
   },
 ];
 
-const GET_CARS = function (req, res) {
-  if (cars.length) {
-    const sortedCars = [...cars].sort((a, b) => a.year - b.year);
-    return res.status(200).json({
-      response: "success",
-      cars: sortedCars,
+const GET_CARS = async function (req, res) {
+  try {
+    const cars = await CarModel.find();
+
+    res.status(200).json({
+      cars: cars,
     });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ message: "server error" });
   }
-  return res.status(404).json({
-    response: "cars array is empty",
-  });
 };
 
 const GET_CAR_BY_ID = function (req, res) {
@@ -59,27 +61,22 @@ const DELETE_CARS = function (req, res) {
   });
 };
 
-const INSERT_CARS = function (req, res) {
-  const id = req.body.id;
-
-  const existingCar = cars.find((car) => {
-    return car.id === id;
-  });
-
-  console.log(existingCar);
-
-  if (!existingCar) {
-    cars.push({
-      id: req.body.id,
+const INSERT_CARS = async function (req, res) {
+  try {
+    const car = new CarModel({
       brand: req.body.brand,
       model: req.body.model,
-      year: req.body.year,
+      price: req.body.price,
+      isNewCar: req.body.isNewCar,
     });
 
-    return res.status(201).json({ message: "car was added successfully" });
-  }
+    await car.save();
 
-  return res.status(409).json({ message: "Car with this id is already exist" });
+    return res.status(201).json({ message: "car was added successfully" });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ message: "server error" });
+  }
 };
 
 const UPDATE_CAR_BY_ID = (req, res) => {
