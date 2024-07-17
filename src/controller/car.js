@@ -1,29 +1,8 @@
 import CarModel from "../model/car.js";
 
-let cars = [
-  {
-    id: 1,
-    brand: "Porsche",
-    model: "Panamera",
-    year: 2018,
-  },
-  {
-    id: 2,
-    brand: "Fiat",
-    model: "500",
-    year: 2020,
-  },
-  {
-    id: 3,
-    brand: "VW",
-    model: "Beetle",
-    year: 1990,
-  },
-];
-
 const GET_CARS = async function (req, res) {
   try {
-    const cars = await CarModel.find();
+    const cars = await CarModel.find().limit(5);
 
     res.status(200).json({
       cars: cars,
@@ -34,31 +13,40 @@ const GET_CARS = async function (req, res) {
   }
 };
 
-const GET_CAR_BY_ID = function (req, res) {
-  const id = req.params.id;
+const GET_CAR_BY_ID = async function (req, res) {
+  try {
+    const id = req.params.id;
 
-  const car = cars.find((car) => {
-    return car.id == id;
-  });
+    const car = await CarModel.findById(id);
 
-  if (!car) {
-    return res.status(404).json({
-      message: `car with ${id} id does not exist`,
+    return res.status(200).json({
+      response: "success",
+      car: car,
     });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ message: "server error" });
   }
-
-  return res.status(200).json({
-    response: "success",
-    car: car,
-  });
 };
 
-const DELETE_CARS = function (req, res) {
-  cars = [];
+const DELETE_CAR = async function (req, res) {
+  try {
+    const id = req.params.id;
 
-  return res.status(200).json({
-    response: "all the cars was deleted",
-  });
+    const car = await CarModel.findByIdAndDelete(id);
+
+    if (!car) {
+      return res.status(404).json({ message: "Your car does not exist" });
+    }
+
+    return res.status(200).json({
+      response: "car was deleted",
+      car: car,
+    });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ message: "server error" });
+  }
 };
 
 const INSERT_CARS = async function (req, res) {
@@ -79,17 +67,17 @@ const INSERT_CARS = async function (req, res) {
   }
 };
 
-const UPDATE_CAR_BY_ID = (req, res) => {
+const UPDATE_CAR_BY_ID = async (req, res) => {
   const id = req.params.id;
-  const body = req.body;
+  const car = await CarModel.findOneAndUpdate(
+    { _id: id },
+    { ...req.body },
+    { new: true }
+  );
 
-  const idx = cars.findIndex((car) => {
-    return car.id == id;
-  });
-
-  cars[idx] = { ...cars[idx], ...body };
-
-  return res.status(200).json({ message: "car was updated successfully" });
+  return res
+    .status(200)
+    .json({ message: "car was updated successfully", car: car });
 };
 
-export { GET_CARS, GET_CAR_BY_ID, DELETE_CARS, INSERT_CARS, UPDATE_CAR_BY_ID };
+export { GET_CARS, GET_CAR_BY_ID, DELETE_CAR, INSERT_CARS, UPDATE_CAR_BY_ID };
