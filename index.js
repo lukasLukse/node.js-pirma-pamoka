@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import mongoose from "mongoose";
 import carRouter from "./src/router/car.js";
+import userRouter from "./src/router/user.js";
 
 import "dotenv/config";
 
@@ -18,6 +19,7 @@ mongoose
   });
 
 app.use(carRouter);
+app.use(userRouter);
 
 app.use((req, res) => {
   return res.status(404).send("Sorry, endpoint does not exist");
