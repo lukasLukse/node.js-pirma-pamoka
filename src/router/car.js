@@ -7,9 +7,10 @@ import {
   UPDATE_CAR_BY_ID,
 } from "../controller/car.js";
 
+import { auth } from "../middlewares/auth.js";
 const router = express.Router();
 
-router.get("/cars", GET_CARS);
+router.get("/cars", auth, GET_CARS);
 
 router.get("/cars/:id", GET_CAR_BY_ID);
 
