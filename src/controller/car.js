@@ -2,7 +2,7 @@ import CarModel from "../model/car.js";
 
 const GET_CARS = async function (req, res) {
   try {
-    const cars = await CarModel.find().limit(5);
+    const cars = await CarModel.find({ userId: req.body.userId });
 
     res.status(200).json({
       cars: cars,
@@ -49,13 +49,14 @@ const DELETE_CAR = async function (req, res) {
   }
 };
 
-const INSERT_CARS = async function (req, res) {
+const INSERT_CAR = async function (req, res) {
   try {
     const car = new CarModel({
       brand: req.body.brand,
       model: req.body.model,
       price: req.body.price,
-      isNewCar: req.body.isNewCar,
+      imgUrl: req.body.imgUrl,
+      userId: req.body.userId,
     });
 
     await car.save();
@@ -80,4 +81,4 @@ const UPDATE_CAR_BY_ID = async (req, res) => {
     .json({ message: "car was updated successfully", car: car });
 };
 
-export { GET_CARS, GET_CAR_BY_ID, DELETE_CAR, INSERT_CARS, UPDATE_CAR_BY_ID };
+export { GET_CARS, GET_CAR_BY_ID, DELETE_CAR, INSERT_CAR, UPDATE_CAR_BY_ID };
